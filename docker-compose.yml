@@ -1,0 +1,27 @@
+version: '2'
+services:
+  nightmare-server:
+    image: kurebio/nightmare-server
+    ports:
+      - 80
+    networks:
+      - front-tier
+      - back-tier
+  nightmare-server-lb:
+    image: dockercloud/haproxy
+    links:
+      - nightmare-server
+    ports:
+      - "8300:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - "TIMEOUT=connect 5000, client 0, server 0"
+    networks:
+      - front-tier
+      - back-tier
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
